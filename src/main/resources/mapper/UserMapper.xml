@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wzp.module.user.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="user" type="com.wzp.module.user.bean.User">
+        <id column="userId" property="id" javaType="java.lang.String"/>
+        <result column="userLoginId" property="loginId" javaType="String" />
+        <result column="userPassword" property="password" javaType="String" />
+        <result column="userLastLoginDate" property="lastLoginDate" javaType="String" />
+        <result column="userIp" property="ip" javaType="String" />
+        <result column="userPhoto" property="photo" javaType="String" />
+        <result column="userTrueName" property="trueName" javaType="String" />
+        <result column="userMobilePhone" property="mobilePhone" javaType="String" />
+        <result column="userEmail" property="email" javaType="String" />
+        <result column="userNickName" property="nickName" javaType="String" />
+        <result column="userGender" property="gender" javaType="String" />
+        <result column="userCreateDate" property="createDate" javaType="Date" />
+        <result column="userUpdateDate" property="updateDate" javaType="Date" />
+        <result column="userStatus" property="status" javaType="String" />
+        <association column="FK_ROLE_ID" property="role" javaType="com.wzp.module.user.bean.Role">
+            <id column="roleId" property="id" javaType="String"/>
+            <result column="roleName" property="name" javaType="String"/>
+            <result column="roleCreateDate" property="createDate" javaType="Date"/>
+            <result column="roleUpdateDate" property="updateDate" javaType="Date"/>
+            <result column="roleStatus" property="status" javaType="String"/>
+        </association>
+    </resultMap>
+
+    <sql id="userColumn">
+        u.id as userId,u.LOGIN_ID as userLoginId,u.PASSWORD as userPassword,u.LAST_LOGIN_DATE as userLastLoginDate,u.LAST_LOGIN_IP as userIp,
+        u.photo as userPhoto,u.true_name as userTrueName ,u.mobile_phone as userMobilePhone, u.email as userEmail,u.nick_name as userNickName,
+        u.flag_gender as userGender,u.create_date as userCreateDate ,u.update_date as userUpdateDate,u.status as userStatus
+    </sql>
+
+    <sql id="roleColumn">
+        r.id as roleId ,r.name as roleName, r.create_date as roleCreateDate,r.update_date as roleUpdateDate,r.status as roleStatus
+    </sql>
+
+    <insert id="create" parameterType="com.wzp.module.user.bean.User" keyProperty="id" useGeneratedKeys="true">
+        <selectKey keyProperty="id" resultType="string" order="BEFORE">
+            select REPLACE(UUID(),'-','')
+        </selectKey>
+        insert into sso_user values (#{id},#{loginId},#{password},#{role.id},#{lastLoginDate},#{ip}
+                                    ,#{photo},#{trueName},#{mobilePhone},#{email},#{nickName},#{gender}
+                                    ,#{createDate},#{updateDate},#{status})
+    </insert>
+
+</mapper>
