@@ -6,4 +6,6 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
 
     void create(User user);
+
+    User selectUserByLoginId(@Param("loginId") String loginId);
 }

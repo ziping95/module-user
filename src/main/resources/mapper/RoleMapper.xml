@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wzp.module.user.mapper.RoleMapper">
+
+    <resultMap id="role" type="com.wzp.module.user.bean.Role">
+        <id column="roleId" property="id" javaType="String"/>
+        <result column="roleCreateDate" property="createDate" javaType="Date"/>
+        <result column="roleUpdateDate" property="updateDate" javaType="Date"/>
+        <result column="roleStatus" property="status" javaType="String" />
+        <result column="roleName" property="name" javaType="String"/>
+        <result column="roleCode" property="code" javaType="Integer"/>
+        <collection property="permissionList" resultMap="permission"/>
+    </resultMap>
+
+    <resultMap id="permission" type="com.wzp.module.user.bean.Permission">
+        <id column="permissionId" property="id" javaType="String"/>
+        <result column="permissionCreateDate" property="createDate" javaType="Date"/>
+        <result column="permissionUpdateDate" property="updateDate" javaType="Date"/>
+        <result column="permissionStatus" property="status" javaType="String" />
+        <result column="permissionName" property="name" javaType="String"/>
+        <result column="permissionPath" property="path" javaType="String"/>
+    </resultMap>
+
+    <sql id="roleColumn">
+        r.id as roleId,r.create_date as roleCreateDate,r.update_date as roleUpdateDate,r.status as roleStatus,r.name as roleName,r.code as roleCode
+    </sql>
+
+    <sql id="permissionColumn">
+        p.id as permissionId,p.create_date as permissionCreateDate,p.update_date as permissionUpdateDate,r.status as permissionStatus,p.name as permissionName,
+        p.path as permissionPath
+    </sql>
+
+    <select id="findAllRole" resultMap="role">
+        select <include refid="roleColumn"/>,<include refid="permissionColumn"/> from module_role r
+        left join module_role_permission rp on r.id = rp.fk_role_id
+        left join module_permission p on rp.fk_permission_id = p.id
+    </select>
+
+</mapper>

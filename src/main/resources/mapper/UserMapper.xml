@@ -24,6 +24,7 @@
             <result column="roleCreateDate" property="createDate" javaType="Date"/>
             <result column="roleUpdateDate" property="updateDate" javaType="Date"/>
             <result column="roleStatus" property="status" javaType="String"/>
+            <result column="roleCode" property="code" javaType="Integer"/>
         </association>
     </resultMap>
 
@@ -34,7 +35,7 @@
     </sql>
 
     <sql id="roleColumn">
-        r.id as roleId ,r.name as roleName, r.create_date as roleCreateDate,r.update_date as roleUpdateDate,r.status as roleStatus
+        r.id as roleId ,r.name as roleName, r.create_date as roleCreateDate,r.update_date as roleUpdateDate,r.status as roleStatus,r.code as roleCode
     </sql>
 
     <insert id="create" parameterType="com.wzp.module.user.bean.User" keyProperty="id" useGeneratedKeys="true">
@@ -45,5 +46,11 @@
                                     ,#{photo},#{trueName},#{mobilePhone},#{email},#{nickName},#{gender}
                                     ,#{createDate},#{updateDate},#{status})
     </insert>
+
+    <select id="selectUserByLoginId" parameterType="string" resultMap="user">
+        select <include refid="userColumn"/>,<include refid="roleColumn"/>
+        from sso_user u inner join module_role r on u.FK_ROLE_ID = r.id
+        where u.LOGIN_ID = #{loginId}
+    </select>
 
 </mapper>
