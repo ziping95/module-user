@@ -1,6 +1,7 @@
 package com.wzp.module.user.controller;
 
 import com.wzp.module.core.utils.RedisUtil;
+import com.wzp.module.user.UserConstant;
 import com.wzp.module.user.bean.Role;
 import com.wzp.module.user.bean.User;
 import com.wzp.module.user.service.UserService;
@@ -41,7 +42,7 @@ public class UserController {
 
     @RequestMapping(value = "/manage/tts/test")
     public String userTest() {
-        return "成功";
+        return UserConstant.getCurrentUser().getId();
     }
 
     @RequestMapping(value = "/open/test")
