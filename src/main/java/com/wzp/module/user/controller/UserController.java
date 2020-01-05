@@ -43,4 +43,9 @@ public class UserController {
     public String userTest() {
         return "成功";
     }
+
+    @RequestMapping(value = "/open/test")
+    public String openTest() {
+        return "success";
+    }
 }
