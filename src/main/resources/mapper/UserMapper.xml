@@ -34,6 +34,11 @@
         u.flag_gender as userGender,u.create_date as userCreateDate ,u.update_date as userUpdateDate,u.status as userStatus
     </sql>
 
+    <sql id="userRawColumn">
+        sso_user(id,LOGIN_ID,PASSWORD,FK_ROLE_ID,LAST_LOGIN_DATE,LAST_LOGIN_IP,photo,true_name,mobile_phone,email,
+        nick_name,flag_gender,create_date,update_date,status)
+    </sql>
+
     <sql id="roleColumn">
         r.id as roleId ,r.name as roleName, r.create_date as roleCreateDate,r.update_date as roleUpdateDate,r.status as roleStatus,r.code as roleCode
     </sql>
@@ -44,13 +49,102 @@
         </selectKey>
         insert into sso_user values (#{id},#{loginId},#{password},#{role.id},#{lastLoginDate},#{ip}
                                     ,#{photo},#{trueName},#{mobilePhone},#{email},#{nickName},#{gender}
-                                    ,#{createDate},#{updateDate},#{status})
+                                    ,DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s'),DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s'),#{status})
     </insert>
 
-    <select id="selectUserByLoginId" parameterType="string" resultMap="user">
+    <select id="detailsByCondition" parameterType="hashmap" resultMap="user">
         select <include refid="userColumn"/>,<include refid="roleColumn"/>
         from sso_user u inner join module_role r on u.FK_ROLE_ID = r.id
-        where u.LOGIN_ID = #{loginId}
+        <where>
+            <if test="userId != null">and u.ID = #{userId}</if>
+            <if test="password != null">and u.PASSWORD = #{password}</if>
+            <if test="ip != null">and u.LAST_LOGIN_IP=#{ip}</if>
+            <if test="photo != null">and u.photo=#{photo}</if>
+            <if test="trueName != null">and u.true_name=#{trueName}</if>
+            <if test="mobilePhone != null">and u.mobile_phone=#{mobilePhone}</if>
+            <if test="email != null">and u.email=#{email}</if>
+            <if test="nickName != null">and u.nick_name=#{nickName}</if>
+            <if test="gender != null">and u.flag_gender=#{gender}</if>
+            <if test="roleId != null">and r.id=#{roleId}</if>
+            <if test="roleName != null">and r.name like "%"#{roleName}"%"</if>
+            <if test="roleCode != null">and r.code=#{roleCode}</if>
+            <if test="loginId != null">and u.LOGIN_ID like "%"#{loginId}"%"</if>
+            <if test="lastLoginDate != null">and u.LAST_LOGIN_DATE like #{lastLoginDate}"%"</if>
+        </where>
     </select>
+
+    <select id="details" parameterType="string" resultMap="user">
+        select <include refid="userColumn"/>,<include refid="roleColumn"/>
+        from sso_user u inner join module_role r on u.FK_ROLE_ID = r.id
+        where u.id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.wzp.module.user.bean.User">
+        update sso_user
+        <set>
+            <if test="loginId != null">LOGIN_ID=#{loginId},</if>
+            <if test="password != null">PASSWORD=#{password},</if>
+            <if test="lastLoginDate != null">LAST_LOGIN_DATE=#{lastLoginDate},</if>
+            <if test="ip != null">LAST_LOGIN_IP=#{ip},</if>
+            <if test="photo != null">photo=#{photo},</if>
+            <if test="trueName != null">true_name=#{trueName},</if>
+            <if test="mobilePhone != null">mobile_phone=#{mobilePhone},</if>
+            <if test="email != null">email=#{email},</if>
+            <if test="nickName != null">nick_name=#{nickName},</if>
+            <if test="gender != null">flag_gender=#{gender},</if>
+            <if test="status != null">status=#{status},</if>
+            <if test="role != null and role.id != null">FK_ROLE_ID=#{role.id},</if>
+            <if test="1 == 1">update_date = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s'),</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="string">
+        delete from sso_user where id = #{id}
+    </delete>
+
+    <select id="list" resultMap="user">
+        select <include refid="userColumn"/>,<include refid="roleColumn"/>
+        from sso_user u inner join module_role r on u.FK_ROLE_ID = r.id
+    </select>
+
+    <insert id="batchCreate" parameterType="arraylist" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="userRawColumn"/> values
+        <foreach collection="list" item="user" index="index" separator=",">
+            (REPLACE(UUID(), '-', ''),#{user.loginId},#{user.password},#{user.role.id},#{user.lastLoginDate},#{user.ip}
+            ,#{user.photo},#{user.trueName},#{user.mobilePhone},#{user.email},#{user.nickName},#{user.gender}
+            ,DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s'),DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s'),#{user.status})
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate" parameterType="arraylist">
+        <!--采用这种方式必须链接数据库时带一个参数allowMultiQueries=true 表示允许批量操作-->
+        <foreach collection="list" item="user" index="index" separator=";">
+            update sso_user
+            <set>
+                <if test="user.loginId != null">LOGIN_ID=#{user.loginId},</if>
+                <if test="user.password != null">PASSWORD=#{user.password},</if>
+                <if test="user.lastLoginDate != null">LAST_LOGIN_DATE=#{user.lastLoginDate},</if>
+                <if test="user.ip != null">LAST_LOGIN_IP=#{user.ip},</if>
+                <if test="user.photo != null">photo=#{user.photo},</if>
+                <if test="user.trueName != null">true_name=#{user.trueName},</if>
+                <if test="user.mobilePhone != null">mobile_phone=#{user.mobilePhone},</if>
+                <if test="user.email != null">email=#{user.email},</if>
+                <if test="user.nickName != null">nick_name=#{user.nickName},</if>
+                <if test="user.gender != null">flag_gender=#{user.gender},</if>
+                <if test="user.status != null">status=#{user.status},</if>
+                <if test="user.role != null and user.role.id != null">FK_ROLE_ID=#{user.role.id},</if>
+                <if test="1 == 1">update_date = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s'),</if>
+            </set>
+            where id=#{user.id}
+        </foreach>
+    </update>
+
+    <delete id="batchDelete" parameterType="arraylist">
+        delete from sso_user where id in
+        <foreach collection="list" item="id" open="(" close=")" separator="," index="index">
+            #{id}
+        </foreach>
+    </delete>
 
 </mapper>
