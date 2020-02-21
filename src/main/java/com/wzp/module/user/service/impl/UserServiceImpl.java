@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Transactional
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
@@ -40,9 +41,11 @@ public class UserServiceImpl implements UserService {
             dataSourceTransactionManager.rollback(transactionStatus);
 
         }
+    }
 
-
-
+    @Override
+    public List<User> list() throws Exception {
+        return this.userMapper.list();
     }
 
     @Override
@@ -62,9 +65,7 @@ public class UserServiceImpl implements UserService {
         System.out.println(userMapper.detailsByCondition(map).get(0));
     }
 
-    private void quartzCreate(User user) throws Exception {
-        userMapper.create(user);
-        System.out.println(user.getId());
-        throw new Exception("测试事务");
+    public void quartzCreate(String s) throws Exception {
+        throw new Exception(s);
     }
 }
