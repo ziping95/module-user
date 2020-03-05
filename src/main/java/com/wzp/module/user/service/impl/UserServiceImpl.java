@@ -66,6 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void quartzCreate(String s) throws Exception {
-        throw new Exception(s);
+        String str = null;
+        str.equals("");
     }
 }
