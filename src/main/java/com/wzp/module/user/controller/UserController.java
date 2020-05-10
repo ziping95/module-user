@@ -7,6 +7,7 @@ import com.wzp.module.user.bean.Role;
 import com.wzp.module.user.bean.User;
 import com.wzp.module.user.mapper.UserMapper;
 import com.wzp.module.user.service.UserService;
+import javafx.application.ConditionalFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,9 @@ import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @RestController
@@ -80,6 +84,19 @@ public class UserController {
             return ResultDataModel.handleSuccessResult(count);
         }
         return ResultDataModel.handleFailureResult();
+    }
 
+    @RequestMapping(value = "/open/test/redis",method = RequestMethod.GET)
+    public ResultDataModel openTest() {
+        return ResultDataModel.handleSuccessResult(RedisUtil.get("test_4"));
+    }
+
+    int i = 0;
+    public void append() {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("1");
+        stringBuffer.append("2");
+        stringBuffer.append("3");
+        new Object().notify();
     }
 }

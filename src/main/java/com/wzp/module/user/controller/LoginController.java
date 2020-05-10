@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.atomic.LongAdder;
 
 @Slf4j
 @RestController
@@ -174,14 +175,14 @@ public class LoginController {
     }
 
     @PostMapping("/open/test/post/upload")
-    public ResultDataModel upload(@RequestParam("pic") MultipartFile multipartFile,@RequestParam("fName") String fname) throws IOException {
+    public ResultDataModel upload(@RequestParam("pic") MultipartFile multipartFile,@RequestParam("fileName") String fileName) throws IOException {
         String dirPath = FileUtil.getWebappPath() + "incoming/";
         File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         InputStream inputStream = multipartFile.getInputStream();
-        String filePath = dirPath + fname;
+        String filePath = dirPath + fileName;
         File file = new File(filePath);
         byte[] buffer = new byte[1024];
         OutputStream outputStream = new FileOutputStream(file);
